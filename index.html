@@ -96,9 +96,7 @@
     padding-top: 2rem;
     border-top: 1px solid var(--line);
   }
-  .section-head .eyebrow {
-    margin-top: 2rem;
-  }
+  .section-head .eyebrow { margin-top: 2rem; }
   .section-head h2 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 500;
@@ -124,12 +122,10 @@
   }
   .card:hover { transform: translateY(-6px); }
   .card .frame {
+    position: relative;
     overflow: hidden;
     background: var(--bg-soft);
     aspect-ratio: 4 / 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-bottom: 1.25rem;
     box-shadow: 0 30px 60px -30px rgba(0,0,0,0.8);
   }
@@ -140,6 +136,25 @@
     transition: transform 1.2s cubic-bezier(.2,.8,.2,1), filter 0.6s ease;
     filter: saturate(0.95);
   }
+  .card .frame::after {
+    content: '⤢';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    color: var(--ink);
+    border-radius: 50%;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .card:hover .frame::after { opacity: 1; }
   .card:hover .frame img {
     transform: scale(1.05);
     filter: saturate(1.1);
@@ -162,38 +177,108 @@
   .modal {
     position: fixed;
     inset: 0;
-    background: rgba(8, 7, 6, 0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(8, 7, 6, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 100;
     display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-  .modal.open { display: flex; opacity: 1; }
+  .modal.open { display: block; opacity: 1; }
   .modal-inner {
-    max-width: 1100px;
-    width: 100%;
-    max-height: 90vh;
+    height: 100vh;
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 3rem;
-    align-items: center;
-    overflow-y: auto;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
   }
-  .modal-inner img {
-    width: 100%;
-    max-height: 85vh;
-    object-fit: contain;
-    box-shadow: 0 40px 80px -30px rgba(0,0,0,0.9);
+
+  /* Viewer (zoomable image area) */
+  .viewer {
+    position: relative;
+    overflow: hidden;
+    background: #08070a;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  .viewer.grabbing { cursor: grabbing; }
+  .viewer-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    user-drag: none;
+    will-change: transform;
+  }
+  .viewer-img.smooth { transition: transform 0.25s cubic-bezier(.2,.8,.2,1); }
+  .zoom-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(14, 13, 11, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    padding: 0.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  }
+  .zoom-controls button {
+    background: none;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-family: 'Cormorant Garamond', serif;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+    min-width: 44px;
+  }
+  .zoom-controls button:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .zoom-controls .scale-readout {
+    color: var(--ink-soft);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    min-width: 56px;
+    text-align: center;
+  }
+  .zoom-hint {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    opacity: 0.7;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+  }
+
+  /* Modal text panel */
+  .modal-text {
+    background: var(--bg);
+    padding: 4rem 2.5rem 2.5rem;
+    overflow-y: auto;
+    border-left: 1px solid var(--line);
   }
   .modal-text h3 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 500;
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
     line-height: 1.15;
     margin-bottom: 0.5rem;
   }
@@ -201,12 +286,13 @@
     color: var(--accent);
     font-style: italic;
     margin-bottom: 1.75rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   .modal-text p {
     color: var(--ink-soft);
     font-weight: 300;
     margin-bottom: 1rem;
+    font-size: 0.95rem;
   }
   .modal-text .info {
     margin-top: 1.75rem;
@@ -214,25 +300,27 @@
     border-top: 1px solid var(--line);
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.5rem 1.5rem;
-    font-size: 0.9rem;
+    gap: 0.6rem 1.25rem;
+    font-size: 0.85rem;
   }
   .modal-text .info dt { color: var(--accent); font-style: italic; }
   .modal-text .info dd { color: var(--ink); }
+
   .close-btn {
     position: fixed;
-    top: 2rem;
-    right: 2rem;
-    background: none;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(14, 13, 11, 0.75);
+    backdrop-filter: blur(14px);
     border: 1px solid var(--line);
     color: var(--ink);
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 1.2rem;
     transition: all 0.3s ease;
-    z-index: 101;
+    z-index: 102;
   }
   .close-btn:hover {
     border-color: var(--accent);
@@ -251,7 +339,6 @@
   }
   footer .accent { color: var(--accent); font-style: italic; }
 
-  /* Reveal animation */
   .reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -262,12 +349,17 @@
     transform: translateY(0);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .modal-inner {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      grid-template-rows: 60vh 40vh;
     }
-    .modal-inner img { max-height: 50vh; }
+    .modal-text {
+      border-left: none;
+      border-top: 1px solid var(--line);
+      padding: 2rem 1.5rem;
+    }
+    .zoom-hint { font-size: 0.7rem; top: 1rem; left: 1rem; }
     section.gallery { padding: 4rem 1.25rem 5rem; }
     .grid { gap: 2.5rem 1.25rem; }
   }
@@ -285,7 +377,7 @@
   <div class="section-head reveal">
     <div class="eyebrow">Selected Works</div>
     <h2>큐레이션 컬렉션</h2>
-    <p>르네상스부터 인상주의, 표현주의에 이르기까지 — 작품을 선택하면 자세히 감상할 수 있습니다.</p>
+    <p>작품을 선택하면 고화질로 감상하고 휠·버튼·드래그로 자유롭게 확대해 볼 수 있습니다.</p>
   </div>
 
   <div class="grid" id="grid"></div>
@@ -293,7 +385,19 @@
 
 <div class="modal" id="modal" role="dialog" aria-modal="true">
   <button class="close-btn" id="closeBtn" aria-label="닫기">×</button>
-  <div class="modal-inner" id="modalInner"></div>
+  <div class="modal-inner">
+    <div class="viewer" id="viewer">
+      <img class="viewer-img" id="viewerImg" alt="" />
+      <div class="zoom-hint" id="zoomHint">스크롤 · 더블클릭 · 드래그로 확대 이동</div>
+      <div class="zoom-controls">
+        <button id="zoomOut" aria-label="축소">−</button>
+        <button id="zoomReset" aria-label="원본 크기로">Fit</button>
+        <span class="scale-readout" id="scaleReadout">100%</span>
+        <button id="zoomIn" aria-label="확대">+</button>
+      </div>
+    </div>
+    <aside class="modal-text" id="modalText"></aside>
+  </div>
 </div>
 
 <footer>
@@ -302,6 +406,9 @@
 </footer>
 
 <script>
+const wm = (filename, w) =>
+  `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${w}`;
+
 const works = [
   {
     title: '별이 빛나는 밤',
@@ -310,7 +417,7 @@ const works = [
     year: '1889',
     medium: '캔버스에 유채, 73.7 × 92.1 cm',
     location: '뉴욕 현대미술관 (MoMA)',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
+    file: 'Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg',
     desc: [
       '생레미 정신병원에 머물던 반 고흐가 새벽 동이 트기 직전 창밖을 그린 작품입니다. 휘몰아치는 푸른 하늘과 노란 별빛은 그가 본 풍경이 아니라, 그가 느낀 풍경입니다.',
       '편지에서 그는 "별을 보면 항상 꿈을 꾸게 된다"고 적었습니다. 이 그림은 고통과 황홀이 한 화폭에 공존하는, 후기 인상주의의 정점입니다.'
@@ -323,7 +430,7 @@ const works = [
     year: 'c. 1665',
     medium: '캔버스에 유채, 44.5 × 39 cm',
     location: '헤이그 마우리츠하위스 미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/1665_Girl_with_a_Pearl_Earring.jpg/800px-1665_Girl_with_a_Pearl_Earring.jpg',
+    file: '1665_Girl_with_a_Pearl_Earring.jpg',
     desc: [
       '"북유럽의 모나리자"로 불리는 이 작품은 특정 인물의 초상이 아닌 트로니(tronie) — 즉 인물 유형 연구화입니다. 어둠 속에서 고개를 돌린 소녀의 시선이 관람자를 사로잡습니다.',
       '귀걸이의 단 두 번의 흰 붓터치만으로 구현된 진주의 광택은, 페르메이르가 빛을 다루는 마술사였음을 증명합니다.'
@@ -336,7 +443,7 @@ const works = [
     year: '1907–1908',
     medium: '캔버스에 유채와 금박, 180 × 180 cm',
     location: '빈 벨베데레 미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/800px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg',
+    file: 'The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg',
     desc: [
       '클림트의 "황금시기"를 대표하는 작품으로, 비잔틴 모자이크와 일본 판화의 영향이 짙게 배어 있습니다. 두 인물의 얼굴은 사실적으로 그려졌지만, 옷과 배경은 평면적인 황금 패턴으로 융합됩니다.',
       '벼랑 끝 꽃밭에 무릎 꿇은 연인의 모습은 사랑의 황홀과 그 위태로움을 동시에 담고 있습니다.'
@@ -349,7 +456,7 @@ const works = [
     year: '1872',
     medium: '캔버스에 유채, 48 × 63 cm',
     location: '파리 마르모탕 모네 미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Monet_-_Impression%2C_Sunrise.jpg/1280px-Monet_-_Impression%2C_Sunrise.jpg',
+    file: 'Monet_-_Impression,_Sunrise.jpg',
     desc: [
       '르 아브르 항구의 새벽 안개를 그린 이 작품은, 한 평론가의 비아냥에서 "인상주의(Impressionism)"라는 사조의 이름을 탄생시켰습니다.',
       '윤곽선 대신 색의 진동으로 빛과 시간을 포착하는 모네의 방식은 회화의 역사를 영원히 바꿔놓았습니다. 주황빛 태양은 사실 회색 하늘과 같은 명도라고 알려져 있습니다.'
@@ -362,7 +469,7 @@ const works = [
     year: 'c. 1485',
     medium: '캔버스에 템페라, 172.5 × 278.9 cm',
     location: '피렌체 우피치 미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1280px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg',
+    file: 'Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg',
     desc: [
       '바다의 거품에서 태어난 사랑의 여신이 조개 위에 실려 키프로스 해안에 닿는 순간을 담았습니다. 르네상스 회화 중 최초로 신화 속 여신의 누드를 정면에 그린 작품으로 평가됩니다.',
       '보티첼리는 윤곽선의 우아함과 시적인 운율로 고대의 이상을 되살려냈습니다 — 이것이 메디치 가문이 후원했던 르네상스의 정수입니다.'
@@ -375,7 +482,7 @@ const works = [
     year: '1893',
     medium: '판지에 유채, 템페라, 파스텔, 91 × 73.5 cm',
     location: '오슬로 노르웨이 국립미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg/800px-Edvard_Munch%2C_1893%2C_The_Scream%2C_oil%2C_tempera_and_pastel_on_cardboard%2C_91_x_73_cm%2C_National_Gallery_of_Norway.jpg',
+    file: 'Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg',
     desc: [
       '뭉크는 일기에 적었습니다 — "친구들과 길을 걷던 중 해가 졌다. 갑자기 하늘이 핏빛으로 변했고, 나는 자연을 관통하는 끝없는 비명을 들었다."',
       '비명을 지르는 것은 인물이 아닙니다. 비명을 지르는 것은 자연이며, 인물은 그 비명을 막으려 귀를 틀어막은 것입니다. 표현주의의 가장 강렬한 선언입니다.'
@@ -388,7 +495,7 @@ const works = [
     year: '1876',
     medium: '캔버스에 유채, 131 × 175 cm',
     location: '파리 오르세 미술관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg/1280px-Pierre-Auguste_Renoir%2C_Le_Moulin_de_la_Galette.jpg',
+    file: 'Pierre-Auguste_Renoir,_Le_Moulin_de_la_Galette.jpg',
     desc: [
       '몽마르트르의 야외 무도장에서 일요일 오후를 즐기는 파리지앵들. 나뭇잎 사이를 통과한 햇빛이 사람들의 얼굴과 옷자락 위에 점점이 흩뿌려집니다.',
       '르누아르는 일상의 행복을 그리는 화가였습니다. 이 작품은 인상주의가 단지 풍경의 빛이 아닌, 삶의 빛을 어떻게 다룰 수 있는지 보여줍니다.'
@@ -401,7 +508,7 @@ const works = [
     year: 'c. 1503–1519',
     medium: '포플러 패널에 유채, 77 × 53 cm',
     location: '파리 루브르 박물관',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg',
+    file: 'Mona_Lisa,_by_Leonardo_da_Vinci,_from_C2RMF_retouched.jpg',
     desc: [
       '피렌체 상인 프란체스코 델 조콘도의 부인 리자 게라르디니의 초상으로 알려져 있습니다. 다 빈치는 이 작은 패널화를 죽을 때까지 손에서 놓지 않았습니다.',
       '윤곽선을 지우고 색채와 명암을 부드럽게 융합하는 "스푸마토" 기법은, 그녀의 미소를 영원히 풀리지 않는 수수께끼로 만들었습니다.'
@@ -409,17 +516,25 @@ const works = [
   }
 ];
 
+works.forEach(w => {
+  w.thumb = wm(w.file, 800);
+  w.full = wm(w.file, 1800);
+});
+
 const grid = document.getElementById('grid');
 const modal = document.getElementById('modal');
-const modalInner = document.getElementById('modalInner');
+const modalText = document.getElementById('modalText');
 const closeBtn = document.getElementById('closeBtn');
+const viewer = document.getElementById('viewer');
+const viewerImg = document.getElementById('viewerImg');
+const scaleReadout = document.getElementById('scaleReadout');
 
 works.forEach((w, i) => {
   const card = document.createElement('article');
   card.className = 'card reveal';
   card.style.transitionDelay = (i % 3) * 0.1 + 's';
   card.innerHTML = `
-    <div class="frame"><img src="${w.img}" alt="${w.title} — ${w.artist}" loading="lazy" /></div>
+    <div class="frame"><img src="${w.thumb}" alt="${w.title} — ${w.artist}" loading="lazy" /></div>
     <h3>${w.title}</h3>
     <p class="meta"><span class="artist">${w.artist}</span> · ${w.year}</p>
   `;
@@ -427,33 +542,180 @@ works.forEach((w, i) => {
   grid.appendChild(card);
 });
 
+/* ---------- Zoom / Pan state ---------- */
+let baseScale = 1;       // scale at which image fits viewer
+let scale = 1;           // current applied scale (>= baseScale)
+let tx = 0, ty = 0;      // translation in viewer pixels (relative to viewer top-left)
+let imgW = 0, imgH = 0;  // natural image dimensions
+let dragging = false;
+let dragStart = null;
+
+const MIN_MULT = 1;      // minimum zoom = base (Fit)
+const MAX_MULT = 8;      // up to 8x base
+
+function applyTransform(smooth = false) {
+  viewerImg.classList.toggle('smooth', smooth);
+  viewerImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  scaleReadout.textContent = Math.round((scale / baseScale) * 100) + '%';
+}
+
+function fitImage(smooth = false) {
+  const vw = viewer.clientWidth;
+  const vh = viewer.clientHeight;
+  if (!imgW || !imgH || !vw || !vh) return;
+  baseScale = Math.min(vw / imgW, vh / imgH);
+  scale = baseScale;
+  tx = (vw - imgW * scale) / 2;
+  ty = (vh - imgH * scale) / 2;
+  clampPan();
+  applyTransform(smooth);
+}
+
+function clampPan() {
+  const vw = viewer.clientWidth;
+  const vh = viewer.clientHeight;
+  const sw = imgW * scale;
+  const sh = imgH * scale;
+  if (sw <= vw) tx = (vw - sw) / 2;
+  else tx = Math.min(0, Math.max(vw - sw, tx));
+  if (sh <= vh) ty = (vh - sh) / 2;
+  else ty = Math.min(0, Math.max(vh - sh, ty));
+}
+
+function zoomAt(factor, cx, cy) {
+  const newScale = Math.max(baseScale * MIN_MULT, Math.min(baseScale * MAX_MULT, scale * factor));
+  if (newScale === scale) return;
+  // Keep point under cursor stable: image-coord at (cx,cy) before == after
+  const ix = (cx - tx) / scale;
+  const iy = (cy - ty) / scale;
+  scale = newScale;
+  tx = cx - ix * scale;
+  ty = cy - iy * scale;
+  clampPan();
+  applyTransform(true);
+}
+
 function openModal(w) {
-  modalInner.innerHTML = `
-    <img src="${w.img}" alt="${w.title}" />
-    <div class="modal-text">
-      <h3>${w.title}</h3>
-      <p class="modal-meta">${w.titleEn} · ${w.artist}, ${w.year}</p>
-      ${w.desc.map(p => `<p>${p}</p>`).join('')}
-      <dl class="info">
-        <dt>재료</dt><dd>${w.medium}</dd>
-        <dt>소장처</dt><dd>${w.location}</dd>
-      </dl>
-    </div>
+  modalText.innerHTML = `
+    <h3>${w.title}</h3>
+    <p class="modal-meta">${w.titleEn} · ${w.artist}, ${w.year}</p>
+    ${w.desc.map(p => `<p>${p}</p>`).join('')}
+    <dl class="info">
+      <dt>재료</dt><dd>${w.medium}</dd>
+      <dt>소장처</dt><dd>${w.location}</dd>
+    </dl>
   `;
+  // Reset transform before loading
+  viewerImg.classList.remove('smooth');
+  viewerImg.style.transform = 'translate(0, 0) scale(0)';
+  viewerImg.alt = w.title;
+  viewerImg.src = w.full;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  viewerImg.onload = () => {
+    imgW = viewerImg.naturalWidth;
+    imgH = viewerImg.naturalHeight;
+    fitImage(false);
+  };
 }
 
 function closeModal() {
   modal.classList.remove('open');
   document.body.style.overflow = '';
+  viewerImg.src = '';
 }
 
 closeBtn.addEventListener('click', closeModal);
-modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
 
-// Reveal on scroll
+/* Zoom controls */
+document.getElementById('zoomIn').addEventListener('click', () => {
+  zoomAt(1.4, viewer.clientWidth / 2, viewer.clientHeight / 2);
+});
+document.getElementById('zoomOut').addEventListener('click', () => {
+  zoomAt(1 / 1.4, viewer.clientWidth / 2, viewer.clientHeight / 2);
+});
+document.getElementById('zoomReset').addEventListener('click', () => fitImage(true));
+
+/* Wheel zoom */
+viewer.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = viewer.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+  zoomAt(factor, cx, cy);
+}, { passive: false });
+
+/* Double-click to toggle 1x ↔ 2.5x at click point */
+viewer.addEventListener('dblclick', e => {
+  const rect = viewer.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  if (scale > baseScale * 1.05) {
+    fitImage(true);
+  } else {
+    zoomAt(2.5, cx, cy);
+  }
+});
+
+/* Drag pan (mouse + touch) */
+function onPointerDown(e) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  dragging = true;
+  dragStart = { x: e.clientX, y: e.clientY, tx, ty };
+  viewer.classList.add('grabbing');
+  viewer.setPointerCapture(e.pointerId);
+}
+function onPointerMove(e) {
+  if (!dragging) return;
+  tx = dragStart.tx + (e.clientX - dragStart.x);
+  ty = dragStart.ty + (e.clientY - dragStart.y);
+  clampPan();
+  applyTransform(false);
+}
+function onPointerUp(e) {
+  if (!dragging) return;
+  dragging = false;
+  viewer.classList.remove('grabbing');
+  try { viewer.releasePointerCapture(e.pointerId); } catch (_) {}
+}
+viewer.addEventListener('pointerdown', onPointerDown);
+viewer.addEventListener('pointermove', onPointerMove);
+viewer.addEventListener('pointerup', onPointerUp);
+viewer.addEventListener('pointercancel', onPointerUp);
+
+/* Pinch zoom (two-finger) */
+let pinch = null;
+viewer.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    const [a, b] = e.touches;
+    const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    pinch = { dist, scale };
+  }
+}, { passive: true });
+viewer.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && pinch) {
+    e.preventDefault();
+    const [a, b] = e.touches;
+    const dist = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    const rect = viewer.getBoundingClientRect();
+    const cx = (a.clientX + b.clientX) / 2 - rect.left;
+    const cy = (a.clientY + b.clientY) / 2 - rect.top;
+    const ratio = dist / pinch.dist;
+    const target = pinch.scale * ratio;
+    zoomAt(target / scale, cx, cy);
+  }
+}, { passive: false });
+viewer.addEventListener('touchend', () => { pinch = null; });
+
+/* Re-fit on resize */
+window.addEventListener('resize', () => {
+  if (modal.classList.contains('open') && imgW) fitImage(false);
+});
+
+/* Reveal on scroll */
 const io = new IntersectionObserver((entries) => {
   entries.forEach(en => {
     if (en.isIntersecting) {
