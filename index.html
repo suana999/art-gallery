@@ -516,7 +516,7 @@
 <header class="hero">
   <div class="eyebrow">The Canvas · Est. 2026</div>
   <h1 class="title">시간을 건너온<br><em>걸작들</em></h1>
-  <p class="lead">한 폭의 그림은 그 시대의 빛과 공기, 화가의 호흡을 담습니다.<br />고전 명화부터 초현실주의까지, 미술사를 거닐어 보세요.</p>
+  <p class="lead">한 폭의 그림은 그 시대의 빛과 공기, 화가의 호흡을 담습니다.<br />고전 명화 · 라파엘전파 · 초현실주의 — 세 사조를 따라 미술사를 거닐어 보세요.</p>
 </header>
 
 <section class="gallery">
@@ -527,6 +527,14 @@
   </div>
 
   <div class="grid" id="classicalGrid"></div>
+
+  <div class="section-head reveal" style="margin-top: 6rem;">
+    <div class="eyebrow">Pre-Raphaelite Brotherhood</div>
+    <h2>라파엘전파</h2>
+    <p>1848년 런던, 일곱 명의 젊은 화가가 라파엘로 이전의 정직한 자연과 문학적 진실로 돌아가자고 외쳤습니다. 빛나는 색채와 신화·문학의 서사가 만나는 빅토리아 시대의 미학.</p>
+  </div>
+
+  <div class="grid" id="preRaphaeliteGrid"></div>
 
   <div class="section-head reveal" style="margin-top: 6rem;">
     <div class="eyebrow">Surrealism</div>
@@ -709,6 +717,61 @@ const classicalWorks = [
   }
 ];
 
+const preRaphaeliteWorks = [
+  {
+    title: '오필리아',
+    titleEn: 'Ophelia',
+    artist: 'John Everett Millais',
+    year: '1851–1852',
+    medium: '캔버스에 유채, 76.2 × 111.8 cm',
+    location: '런던 테이트 브리튼',
+    file: 'John_Everett_Millais_-_Ophelia_-_Google_Art_Project.jpg',
+    desc: [
+      '셰익스피어 〈햄릿〉 4막에서 미쳐버린 오필리아가 강물에 잠겨 죽어가는 장면입니다. 밀레이는 강가의 식물 하나하나를 야외에서 직접 관찰하며 그렸습니다 — 미나리아재비, 데이지, 팬지, 뱀머리꽃 모두 죽음과 슬픔의 상징입니다.',
+      '모델 엘리자베스 시달은 욕조에 누워 포즈를 잡았는데, 양초가 꺼진 줄도 모른 화가가 작업에 몰두하다가 그녀가 폐렴에 걸렸다는 일화가 유명합니다. 라파엘전파의 자연주의와 문학적 비극이 정점에서 만난 작품입니다.'
+    ]
+  },
+  {
+    title: '샬롯의 여인',
+    titleEn: 'The Lady of Shalott',
+    artist: 'John William Waterhouse',
+    year: '1888',
+    medium: '캔버스에 유채, 153 × 200 cm',
+    location: '런던 테이트 브리튼',
+    file: 'John_William_Waterhouse_-_The_Lady_of_Shalott_-_Google_Art_Project_edit.jpg',
+    desc: [
+      '테니슨의 시 〈샬롯의 여인〉을 그린 작품입니다. 거울로만 세상을 봐야 하는 저주에 걸린 여인이, 기사 랜슬롯의 모습을 직접 보고 만 그 순간 — 거울이 깨지고 그녀는 죽음을 향해 보트를 타고 흘러갑니다.',
+      '입을 살짝 벌린 채 마지막 노래를 부르는 그녀의 표정, 보트의 뱃머리에서 막 꺼지려는 세 자루의 촛불, 손에 풀린 사슬. 워터하우스는 빅토리아 시대 영국이 사랑한 비극적 낭만의 아이콘을 빚어냈습니다.'
+    ]
+  },
+  {
+    title: '프로세르피나',
+    titleEn: 'Proserpine',
+    artist: 'Dante Gabriel Rossetti',
+    year: '1874',
+    medium: '캔버스에 유채, 125.1 × 61 cm',
+    location: '런던 테이트 브리튼',
+    file: 'Dante_Gabriel_Rossetti_-_Proserpine_-_Google_Art_Project.jpg',
+    desc: [
+      '하데스에게 납치된 페르세포네(로마식 이름 프로세르피나)가 지하세계에서 석류 여섯 알을 먹은 죄로, 매년 여섯 달은 어둠 속에 갇혀야 했습니다. 손에 든 베어진 석류는 그 운명의 봉인입니다.',
+      '모델은 로세티가 평생 사랑한 제인 모리스 — 친구 윌리엄 모리스의 아내였습니다. 멜랑콜리한 눈빛, 무거운 입술, 푸른 가운의 주름 속에서 갇힌 사랑과 운명에 대한 화가의 고백이 흐릅니다.'
+    ]
+  },
+  {
+    title: '멀린의 유혹',
+    titleEn: 'The Beguiling of Merlin',
+    artist: 'Edward Burne-Jones',
+    year: '1872–1877',
+    medium: '캔버스에 유채, 186 × 111 cm',
+    location: '리버풀 레이디 레버 미술관',
+    file: 'Edward_Burne-Jones_-_The_Beguiling_of_Merlin.jpg',
+    desc: [
+      '아서왕 전설에서 위대한 마법사 멀린이, 자신이 가르친 호수의 여인 비비안에게 영원히 봉인되는 순간입니다. 산사나무 가지 사이에 무력하게 누운 노현자, 그의 책에서 자신의 주문을 읽어 그를 가두는 젊은 여인.',
+      '모델 비비안은 번존스가 사랑에 빠졌다가 결별한 마리아 잠바코였습니다. 욕망의 위험과 권력의 역전, 그리고 화가 자신의 고통이 한 폭에 응축된 라파엘전파 후기의 걸작입니다.'
+    ]
+  }
+];
+
 const surrealistWorks = [
   {
     title: '세속적 쾌락의 동산',
@@ -766,7 +829,7 @@ const surrealistWorks = [
   }
 ];
 
-const allWorks = [...classicalWorks, ...surrealistWorks];
+const allWorks = [...classicalWorks, ...preRaphaeliteWorks, ...surrealistWorks];
 allWorks.forEach(w => {
   w.thumb = wm(w.file, 800, w.source);
   w.full = wm(w.file, 1800, w.source);
@@ -795,6 +858,7 @@ function renderGrid(items, gridEl) {
 }
 
 renderGrid(classicalWorks, document.getElementById('classicalGrid'));
+renderGrid(preRaphaeliteWorks, document.getElementById('preRaphaeliteGrid'));
 renderGrid(surrealistWorks, document.getElementById('surrealistGrid'));
 
 /* ---------- Zoom / Pan state ---------- */
