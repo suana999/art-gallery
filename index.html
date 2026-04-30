@@ -306,6 +306,152 @@
   .modal-text .info dt { color: var(--accent); font-style: italic; }
   .modal-text .info dd { color: var(--ink); }
 
+  /* Comments section */
+  .comments {
+    margin-top: 2.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .comments h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .comments h4 .count {
+    color: var(--accent);
+    font-style: italic;
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+  .comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-bottom: 1.5rem;
+  }
+  .cf-name, .cf-content {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 0.65rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 300;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .cf-name::placeholder, .cf-content::placeholder { color: var(--ink-soft); opacity: 0.6; }
+  .cf-name:focus, .cf-content:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .cf-content {
+    min-height: 80px;
+    line-height: 1.55;
+    resize: vertical;
+  }
+  .cf-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .cf-count {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .cf-row button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.55rem 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-style: italic;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: opacity 0.2s, transform 0.2s;
+    font-weight: 500;
+  }
+  .cf-row button:hover { transform: translateY(-1px); }
+  .cf-row button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .cf-status {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    min-height: 1.1em;
+    margin-top: -0.2rem;
+  }
+  .cf-status.error { color: #d97777; }
+  .cf-status.success { color: #8fb98a; }
+  .comment-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin: 0;
+    padding: 0;
+  }
+  .comment-item {
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .comment-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .comment-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.35rem;
+    gap: 0.5rem;
+  }
+  .comment-name {
+    color: var(--accent);
+    font-style: italic;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+  .comment-time {
+    color: var(--ink-soft);
+    font-size: 0.75rem;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    white-space: nowrap;
+  }
+  .comment-content {
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  .comments-empty {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+  }
+  .comments-disabled {
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    font-style: italic;
+    background: var(--bg-soft);
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    border: 1px dashed var(--line);
+    line-height: 1.5;
+  }
+
   .close-btn {
     position: fixed;
     top: 1.25rem;
@@ -405,7 +551,44 @@
   <p style="margin-top:0.5rem;">© 2026 — Made with reverence for the masters.</p>
 </footer>
 
-<script>
+<script type="module">
+/* ============================================================
+   FIREBASE CONFIG  ──  댓글 기능을 켜려면 아래에 값을 채우세요.
+   Firebase Console → ⚙️ 프로젝트 설정 → 일반 → 내 앱(웹) → SDK 설정 및 구성
+   비워두면 댓글 영역에 "설정 필요" 안내가 표시됩니다.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+/* ============================================================ */
+
+let fb = null;
+if (firebaseConfig.apiKey) {
+  try {
+    const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const fsMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const app = appMod.initializeApp(firebaseConfig);
+    fb = {
+      db: fsMod.getFirestore(app),
+      collection: fsMod.collection,
+      query: fsMod.query,
+      where: fsMod.where,
+      orderBy: fsMod.orderBy,
+      limit: fsMod.limit,
+      onSnapshot: fsMod.onSnapshot,
+      addDoc: fsMod.addDoc,
+      serverTimestamp: fsMod.serverTimestamp
+    };
+  } catch (err) {
+    console.error('Firebase init failed:', err);
+  }
+}
+
 const wm = (filename, w) =>
   `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${w}`;
 
@@ -595,6 +778,142 @@ function zoomAt(factor, cx, cy) {
   applyTransform(true);
 }
 
+/* ---------- Comments ---------- */
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
+
+function timeAgo(date) {
+  if (!date) return '방금';
+  const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (sec < 60) return '방금';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min}분 전`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr}시간 전`;
+  const day = Math.floor(hr / 24);
+  if (day < 7) return `${day}일 전`;
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function renderComments(items) {
+  const list = document.getElementById('commentList');
+  const count = document.getElementById('commentCount');
+  if (!list || !count) return;
+  count.textContent = items.length === 0 ? '아직 없음' : `${items.length}개`;
+  if (items.length === 0) {
+    list.innerHTML = `<li class="comments-empty">첫 감상평을 남겨보세요.</li>`;
+    return;
+  }
+  list.innerHTML = items.map(c => `
+    <li class="comment-item">
+      <div class="comment-head">
+        <span class="comment-name">${escapeHtml(c.name || '익명')}</span>
+        <span class="comment-time">${timeAgo(c.createdAt?.toDate ? c.createdAt.toDate() : null)}</span>
+      </div>
+      <div class="comment-content">${escapeHtml(c.content)}</div>
+    </li>
+  `).join('');
+}
+
+let unsubComments = null;
+
+function subscribeComments(workId) {
+  if (!fb) return;
+  if (unsubComments) { unsubComments(); unsubComments = null; }
+  const q = fb.query(
+    fb.collection(fb.db, 'comments'),
+    fb.where('workId', '==', workId),
+    fb.orderBy('createdAt', 'desc'),
+    fb.limit(200)
+  );
+  unsubComments = fb.onSnapshot(q, snap => {
+    renderComments(snap.docs.map(d => d.data()));
+  }, err => {
+    console.error('comments subscribe error:', err);
+    const list = document.getElementById('commentList');
+    if (list) list.innerHTML = `<li class="comments-empty">댓글을 불러올 수 없습니다.</li>`;
+  });
+}
+
+function attachCommentForm(workId) {
+  const form = document.getElementById('commentForm');
+  const nameEl = document.getElementById('cfName');
+  const contentEl = document.getElementById('cfContent');
+  const countEl = document.getElementById('cfCount');
+  const submitBtn = document.getElementById('cfSubmit');
+  const statusEl = document.getElementById('cfStatus');
+  if (!form) return;
+
+  const updateCount = () => { countEl.textContent = `${contentEl.value.length} / 500`; };
+  contentEl.addEventListener('input', updateCount);
+  updateCount();
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const name = (nameEl.value || '').trim().slice(0, 30) || '익명';
+    const content = (contentEl.value || '').trim();
+    if (!content) return;
+    if (content.length > 500) {
+      statusEl.textContent = '500자 이하로 작성해주세요.';
+      statusEl.className = 'cf-status error';
+      return;
+    }
+    submitBtn.disabled = true;
+    statusEl.textContent = '남기는 중...';
+    statusEl.className = 'cf-status';
+    try {
+      await fb.addDoc(fb.collection(fb.db, 'comments'), {
+        workId,
+        name,
+        content,
+        createdAt: fb.serverTimestamp()
+      });
+      contentEl.value = '';
+      updateCount();
+      statusEl.textContent = '감상평이 등록되었습니다.';
+      statusEl.className = 'cf-status success';
+      setTimeout(() => { statusEl.textContent = ''; }, 2500);
+    } catch (err) {
+      console.error('comment post error:', err);
+      statusEl.textContent = '등록에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      statusEl.className = 'cf-status error';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+function commentsSectionHTML(workId) {
+  if (!fb) {
+    return `
+      <section class="comments">
+        <h4>감상평</h4>
+        <div class="comments-disabled">
+          댓글 기능이 아직 설정되지 않았습니다. 사이트 운영자가 Firebase 설정을 마치면 자동으로 활성화됩니다.
+        </div>
+      </section>
+    `;
+  }
+  return `
+    <section class="comments">
+      <h4>감상평 <span class="count" id="commentCount">불러오는 중...</span></h4>
+      <form class="comment-form" id="commentForm" autocomplete="off">
+        <input class="cf-name" id="cfName" placeholder="이름 (비워두면 '익명')" maxlength="30" />
+        <textarea class="cf-content" id="cfContent" placeholder="이 작품을 감상한 느낌을 자유롭게 남겨보세요..." maxlength="500" required></textarea>
+        <div class="cf-row">
+          <span class="cf-count" id="cfCount">0 / 500</span>
+          <button type="submit" id="cfSubmit">남기기</button>
+        </div>
+        <div class="cf-status" id="cfStatus"></div>
+      </form>
+      <ul class="comment-list" id="commentList">
+        <li class="comments-empty">불러오는 중...</li>
+      </ul>
+    </section>
+  `;
+}
+
 function openModal(w) {
   modalText.innerHTML = `
     <h3>${w.title}</h3>
@@ -604,6 +923,7 @@ function openModal(w) {
       <dt>재료</dt><dd>${w.medium}</dd>
       <dt>소장처</dt><dd>${w.location}</dd>
     </dl>
+    ${commentsSectionHTML(w.file)}
   `;
   // Reset transform before loading
   viewerImg.classList.remove('smooth');
@@ -618,12 +938,18 @@ function openModal(w) {
     imgH = viewerImg.naturalHeight;
     fitImage(false);
   };
+
+  if (fb) {
+    attachCommentForm(w.file);
+    subscribeComments(w.file);
+  }
 }
 
 function closeModal() {
   modal.classList.remove('open');
   document.body.style.overflow = '';
   viewerImg.src = '';
+  if (unsubComments) { unsubComments(); unsubComments = null; }
 }
 
 closeBtn.addEventListener('click', closeModal);
