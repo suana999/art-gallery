@@ -516,17 +516,25 @@
 <header class="hero">
   <div class="eyebrow">The Canvas · Est. 2026</div>
   <h1 class="title">시간을 건너온<br><em>걸작들</em></h1>
-  <p class="lead">한 폭의 그림은 그 시대의 빛과 공기, 화가의 호흡을 담습니다.<br />여덟 점의 작품을 통해 미술사를 거닐어 보세요.</p>
+  <p class="lead">한 폭의 그림은 그 시대의 빛과 공기, 화가의 호흡을 담습니다.<br />고전 명화부터 초현실주의까지, 미술사를 거닐어 보세요.</p>
 </header>
 
 <section class="gallery">
   <div class="section-head reveal">
-    <div class="eyebrow">Selected Works</div>
-    <h2>큐레이션 컬렉션</h2>
-    <p>작품을 선택하면 고화질로 감상하고 휠·버튼·드래그로 자유롭게 확대해 볼 수 있습니다.</p>
+    <div class="eyebrow">Classical Masterpieces</div>
+    <h2>고전 명화</h2>
+    <p>르네상스부터 인상주의까지 — 작품을 클릭하면 고화질로 감상하고 휠·드래그로 자유롭게 확대해 볼 수 있습니다.</p>
   </div>
 
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="classicalGrid"></div>
+
+  <div class="section-head reveal" style="margin-top: 6rem;">
+    <div class="eyebrow">Surrealism</div>
+    <h2>초현실주의</h2>
+    <p>현실의 균열에서 피어난 환상 — 보스의 환영부터 달리의 흐르는 시계까지, 무의식의 풍경을 거닐어 보세요.</p>
+  </div>
+
+  <div class="grid" id="surrealistGrid"></div>
 </section>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true">
@@ -589,10 +597,12 @@ if (firebaseConfig.apiKey) {
   }
 }
 
-const wm = (filename, w) =>
-  `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${w}`;
+const wm = (filename, w, source = 'commons') => {
+  const host = source === 'wiki' ? 'en.wikipedia.org' : 'commons.wikimedia.org';
+  return `https://${host}/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=${w}`;
+};
 
-const works = [
+const classicalWorks = [
   {
     title: '별이 빛나는 밤',
     titleEn: 'The Starry Night',
@@ -699,12 +709,69 @@ const works = [
   }
 ];
 
-works.forEach(w => {
-  w.thumb = wm(w.file, 800);
-  w.full = wm(w.file, 1800);
+const surrealistWorks = [
+  {
+    title: '세속적 쾌락의 동산',
+    titleEn: 'The Garden of Earthly Delights',
+    artist: 'Hieronymus Bosch',
+    year: 'c. 1490–1500',
+    medium: '오크 패널에 유채, 220 × 389 cm (3폭 제단화)',
+    location: '마드리드 프라도 미술관',
+    file: 'The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution.jpg',
+    desc: [
+      '낙원의 창조 — 세속의 환락 — 지옥의 형벌. 세 폭에 걸쳐 인간의 운명을 그린 보스의 걸작입니다. 초현실주의가 등장하기 400년 전, 이미 무의식의 풍경이 펼쳐져 있었습니다.',
+      '딸기 위에 올라탄 인간들, 거대한 새와 물고기, 알 속에서 자라는 생명체 — 보스의 환상은 훗날 달리, 마그리트, 에른스트가 도달한 지점의 출발점이 됩니다.'
+    ]
+  },
+  {
+    title: '꿈',
+    titleEn: 'The Dream',
+    artist: 'Henri Rousseau',
+    year: '1910',
+    medium: '캔버스에 유채, 204.5 × 298.5 cm',
+    location: '뉴욕 현대미술관 (MoMA)',
+    file: 'Henri_Rousseau_-_Il_sogno.jpg',
+    desc: [
+      '루소가 죽기 직전 완성한 마지막 걸작입니다. 정글 한가운데 놓인 빅토리아 시대의 소파, 그 위에 누운 나체의 여인 — 비논리적 결합이 만들어내는 강렬한 환상.',
+      '정규 미술 교육을 받지 않은 세관원 출신 화가의 "순진한" 시선이 오히려 초현실주의자들에게 영감을 주었습니다. 앙드레 브르통은 그를 "초현실주의의 선구자"라 불렀습니다.'
+    ]
+  },
+  {
+    title: '기억의 지속',
+    titleEn: 'The Persistence of Memory',
+    artist: 'Salvador Dalí',
+    year: '1931',
+    medium: '캔버스에 유채, 24 × 33 cm',
+    location: '뉴욕 현대미술관 (MoMA)',
+    file: 'The_Persistence_of_Memory.jpg',
+    source: 'wiki',
+    desc: [
+      '녹아내리는 시계들이 황량한 카탈루냐 해안에 흩어져 있습니다. 달리는 어느 저녁 식탁 위에서 녹아가던 카망베르 치즈를 보고 이 환상을 떠올렸다고 회고했습니다.',
+      '아인슈타인의 상대성 이론, 프로이트의 무의식, 그리고 시간이라는 개념의 유연함 — 26세 달리의 이 작은 캔버스는 20세기 미술에서 가장 유명한 이미지가 되었습니다.'
+    ]
+  },
+  {
+    title: '이미지의 배반',
+    titleEn: 'The Treachery of Images',
+    artist: 'René Magritte',
+    year: '1929',
+    medium: '캔버스에 유채, 60.3 × 81.1 cm',
+    location: '로스앤젤레스 카운티 미술관 (LACMA)',
+    file: 'MagrittePipe.jpg',
+    source: 'wiki',
+    desc: [
+      '"이것은 파이프가 아니다 (Ceci n\'est pas une pipe)." 정확하게 그려진 파이프 아래 적힌 이 한 문장이 회화의 전제 자체를 뒤흔듭니다.',
+      '마그리트는 옳습니다. 우리가 보고 있는 것은 파이프가 아니라 파이프의 그림이니까요. 이미지와 언어, 표상과 실재 사이의 균열을 응시하게 만드는 가장 영리한 한 폭입니다.'
+    ]
+  }
+];
+
+const allWorks = [...classicalWorks, ...surrealistWorks];
+allWorks.forEach(w => {
+  w.thumb = wm(w.file, 800, w.source);
+  w.full = wm(w.file, 1800, w.source);
 });
 
-const grid = document.getElementById('grid');
 const modal = document.getElementById('modal');
 const modalText = document.getElementById('modalText');
 const closeBtn = document.getElementById('closeBtn');
@@ -712,18 +779,23 @@ const viewer = document.getElementById('viewer');
 const viewerImg = document.getElementById('viewerImg');
 const scaleReadout = document.getElementById('scaleReadout');
 
-works.forEach((w, i) => {
-  const card = document.createElement('article');
-  card.className = 'card reveal';
-  card.style.transitionDelay = (i % 3) * 0.1 + 's';
-  card.innerHTML = `
-    <div class="frame"><img src="${w.thumb}" alt="${w.title} — ${w.artist}" loading="lazy" /></div>
-    <h3>${w.title}</h3>
-    <p class="meta"><span class="artist">${w.artist}</span> · ${w.year}</p>
-  `;
-  card.addEventListener('click', () => openModal(w));
-  grid.appendChild(card);
-});
+function renderGrid(items, gridEl) {
+  items.forEach((w, i) => {
+    const card = document.createElement('article');
+    card.className = 'card reveal';
+    card.style.transitionDelay = (i % 3) * 0.1 + 's';
+    card.innerHTML = `
+      <div class="frame"><img src="${w.thumb}" alt="${w.title} — ${w.artist}" loading="lazy" /></div>
+      <h3>${w.title}</h3>
+      <p class="meta"><span class="artist">${w.artist}</span> · ${w.year}</p>
+    `;
+    card.addEventListener('click', () => openModal(w));
+    gridEl.appendChild(card);
+  });
+}
+
+renderGrid(classicalWorks, document.getElementById('classicalGrid'));
+renderGrid(surrealistWorks, document.getElementById('surrealistGrid'));
 
 /* ---------- Zoom / Pan state ---------- */
 let baseScale = 1;       // scale at which image fits viewer
