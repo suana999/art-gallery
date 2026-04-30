@@ -821,14 +821,21 @@ let unsubComments = null;
 function subscribeComments(workId) {
   if (!fb) return;
   if (unsubComments) { unsubComments(); unsubComments = null; }
+  // No orderBy on server side — avoids composite-index requirement.
+  // Sort client-side after fetch (limit 200 keeps it cheap).
   const q = fb.query(
     fb.collection(fb.db, 'comments'),
     fb.where('workId', '==', workId),
-    fb.orderBy('createdAt', 'desc'),
     fb.limit(200)
   );
   unsubComments = fb.onSnapshot(q, snap => {
-    renderComments(snap.docs.map(d => d.data()));
+    const items = snap.docs.map(d => d.data());
+    items.sort((a, b) => {
+      const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return tb - ta;
+    });
+    renderComments(items);
   }, err => {
     console.error('comments subscribe error:', err);
     const list = document.getElementById('commentList');
